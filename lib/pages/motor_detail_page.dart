@@ -47,6 +47,7 @@ class _MotorDetailPageState extends State<MotorDetailPage> {
 
             // Extract motor data
             String namaMotor = motorDoc['namaMotor'];
+            int kapasitasMesin = motorDoc['kapasitas_mesin'];
             int harga = motorDoc['harga'];
             String merk = motorDoc['merk'];
             String imageUrl = motorDoc['Image'];
@@ -92,6 +93,22 @@ class _MotorDetailPageState extends State<MotorDetailPage> {
                         ),
                         title: Text(
                           merk,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        leading: Text(
+                          'Kapasitas Mesin',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        title: Text(
+                          '${kapasitasMesin.toString()} cc',
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,

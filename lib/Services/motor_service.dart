@@ -7,10 +7,11 @@ class MotorService {
       FirebaseFirestore.instance.collection('motor');
 
   // Create
-  Future<void> addMotor(
-      String namaMotor, int harga, String merk, var downloadUrl) {
+  Future<void> addMotor(String namaMotor, int harga, String merk,
+      var downloadUrl, int kapasitasMesin) {
     return motor.add({
       'namaMotor': namaMotor,
+      'kapasitas_mesin': kapasitasMesin,
       'harga': harga,
       'merk': merk,
       'timestamp': Timestamp.now(),
@@ -41,12 +42,13 @@ class MotorService {
     return motorData.delete();
   }
 
-  Future<void> updateMotor(String docID, String namaMotor, int harga,
-      String merk, String imageUrl) async {
+  Future<void> updateMotor(String docID, String namaMotor, int kapasitasMesin,
+      int harga, String merk, String imageUrl) async {
     DocumentReference docRef = motor.doc(docID);
 
     await docRef.update({
       'namaMotor': namaMotor,
+      'kapasitas_mesin': kapasitasMesin,
       'harga': harga,
       'merk': merk,
       'Image': imageUrl,

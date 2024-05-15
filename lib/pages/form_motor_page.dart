@@ -24,6 +24,8 @@ class _FormMotorPageState extends State<FormMotorPage> {
 
   TextEditingController merkController = TextEditingController();
 
+  TextEditingController kapasitasMesinController = TextEditingController();
+
   TextEditingController hargaController = TextEditingController();
 
   List<String> listMerk = ['Yamaha', 'Honda', 'Vespa'];
@@ -71,7 +73,8 @@ class _FormMotorPageState extends State<FormMotorPage> {
     if (namaMotorController.text.isNotEmpty &&
         selectedMerk.isNotEmpty &&
         hargaController.text.isNotEmpty &&
-        selectedImage.toString().isNotEmpty) {
+        selectedImage.toString().isNotEmpty &&
+        kapasitasMesinController.text.isNotEmpty) {
       showDialog(
         context: context,
         builder: (context) {
@@ -104,6 +107,7 @@ class _FormMotorPageState extends State<FormMotorPage> {
                     int.parse(hargaController.text),
                     selectedMerk,
                     downloadUrl,
+                    int.parse(kapasitasMesinController.text),
                   );
                   Navigator.pop(context);
                   Navigator.popAndPushNamed(context, '/add_motor_page');
@@ -161,6 +165,7 @@ class _FormMotorPageState extends State<FormMotorPage> {
                   MotorService().updateMotor(
                     widget.docID!,
                     namaMotorController.text,
+                    int.parse(kapasitasMesinController.text),
                     int.parse(hargaController.text),
                     selectedMerk,
                     imageUrl!,
@@ -194,10 +199,12 @@ class _FormMotorPageState extends State<FormMotorPage> {
     }
   }
 
-  Widget form(String? namaMotor, String? merk, String? image, int? harga) {
+  Widget form(String? namaMotor, int? kapasitasMesin, String? merk,
+      String? image, int? harga) {
     if (namaMotor != null && merk != null && image != null && harga != null) {
       namaMotorController.text = namaMotor;
       selectedMerk = merk;
+      kapasitasMesinController.text = kapasitasMesin.toString();
       hargaController.text = harga.toString();
       this.image = image;
     }
@@ -227,6 +234,11 @@ class _FormMotorPageState extends State<FormMotorPage> {
                 ),
                 // Input Nama Motor
                 _textField('Nama Motor', namaMotorController),
+                SizedBox(
+                  height: 10,
+                ),
+
+                _textField('Kapasitas Mesin', kapasitasMesinController),
                 SizedBox(
                   height: 10,
                 ),
@@ -347,15 +359,16 @@ class _FormMotorPageState extends State<FormMotorPage> {
                 }
                 DocumentSnapshot motorDoc = snapshot.data!;
                 String namaMotor = motorDoc['namaMotor'];
+                int kapasitasMesin = motorDoc['kapasitas_mesin'];
                 int harga = motorDoc['harga'];
                 String merk = motorDoc['merk'];
                 String imageUrl = motorDoc['Image'];
                 print(imageUrl);
 
-                return form(namaMotor, merk, imageUrl, harga);
+                return form(namaMotor, kapasitasMesin, merk, imageUrl, harga);
               },
             )
-          : form(null, null, null, null),
+          : form(null, null, null, null, null),
     );
   }
 }
