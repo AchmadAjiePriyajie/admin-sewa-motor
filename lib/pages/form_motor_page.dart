@@ -109,8 +109,7 @@ class _FormMotorPageState extends State<FormMotorPage> {
                     downloadUrl,
                     int.parse(kapasitasMesinController.text),
                   );
-                  Navigator.pop(context);
-                  Navigator.popAndPushNamed(context, '/add_motor_page');
+                  Navigator.popAndPushNamed(context, '/motor_page');
                 },
                 child: Text(
                   'Simpan',

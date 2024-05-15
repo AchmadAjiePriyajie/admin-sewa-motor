@@ -1,24 +1,24 @@
+import 'package:admin_sewa_motor/models/motor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 
 class MotorService {
   final CollectionReference motor =
       FirebaseFirestore.instance.collection('motor');
 
-  // Create
   Future<void> addMotor(String namaMotor, int harga, String merk,
       var downloadUrl, int kapasitasMesin) {
-    return motor.add({
-      'namaMotor': namaMotor,
-      'kapasitas_mesin': kapasitasMesin,
-      'harga': harga,
-      'merk': merk,
-      'timestamp': Timestamp.now(),
-      // add image
-      "Image": downloadUrl.toString(),
-      'isOrdered': false
-    });
+    return motor.add(
+      Motor(
+        namaMotor: namaMotor,
+        harga: harga,
+        merk: merk,
+        kapasitasMesin: kapasitasMesin,
+        imageUrl: downloadUrl,
+        isOrdered: false,
+        timestamp: Timestamp.now(),
+      ).toJson(),
+    );
   }
 
   Stream<QuerySnapshot> getMotorStream() {
@@ -46,12 +46,15 @@ class MotorService {
       int harga, String merk, String imageUrl) async {
     DocumentReference docRef = motor.doc(docID);
 
-    await docRef.update({
-      'namaMotor': namaMotor,
-      'kapasitas_mesin': kapasitasMesin,
-      'harga': harga,
-      'merk': merk,
-      'Image': imageUrl,
-    });
+    await docRef.update(
+      Motor(
+        namaMotor: namaMotor,
+        harga: harga,
+        merk: merk,
+        kapasitasMesin: kapasitasMesin,
+        imageUrl: imageUrl,
+        isOrdered: false,
+      ) as Map<Object, Object?>,
+    );
   }
 }
