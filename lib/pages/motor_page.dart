@@ -55,8 +55,7 @@ class _MotorPageState extends State<MotorPage> {
           ),
           TextButton(
             onPressed: () {
-              motorService.deleteNote(docID);
-
+              motorService.deleteMotor(docID);
               Navigator.pop(context);
             },
             child: Container(

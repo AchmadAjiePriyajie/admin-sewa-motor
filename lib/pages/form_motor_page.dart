@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:admin_sewa_motor/Services/motor_service.dart';
 import 'package:admin_sewa_motor/components/my_button.dart';
 import 'package:admin_sewa_motor/components/my_textfield.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,8 +22,6 @@ class FormMotorPage extends StatefulWidget {
 class _FormMotorPageState extends State<FormMotorPage> {
   TextEditingController namaMotorController = TextEditingController();
 
-  TextEditingController imagePathController = TextEditingController();
-
   TextEditingController merkController = TextEditingController();
 
   TextEditingController hargaController = TextEditingController();
@@ -32,6 +31,19 @@ class _FormMotorPageState extends State<FormMotorPage> {
   late String selectedMerk = listMerk.first;
 
   File? selectedImage;
+
+  String? image;
+
+  MotorService motorService = MotorService();
+  Future<DocumentSnapshot?>? _motorData; // Use a Future to hold the data
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.docID != null) {
+      _motorData = motorService.getMotorById(widget.docID!);
+    }
+  }
 
   Widget _textField(String title, TextEditingController controller) {
     return Column(
@@ -113,8 +125,7 @@ class _FormMotorPageState extends State<FormMotorPage> {
   void updateMotor() {
     if (namaMotorController.text.isNotEmpty &&
         selectedMerk.isNotEmpty &&
-        hargaController.text.isNotEmpty &&
-        selectedImage != null) {
+        hargaController.text.isNotEmpty) {
       showDialog(
         context: context,
         builder: (context) {
@@ -133,21 +144,28 @@ class _FormMotorPageState extends State<FormMotorPage> {
               ),
               TextButton(
                 onPressed: () async {
-                  var imageName =
-                      DateTime.now().millisecondsSinceEpoch.toString();
-                  var storageRef = FirebaseStorage.instance
-                      .ref()
-                      .child('images/motor/$imageName.jpg');
-                  var uploadTask = storageRef.putFile(selectedImage!);
-                  var downloadUrl =
-                      await (await uploadTask).ref.getDownloadURL();
+                  var imageUrl;
+                  if (selectedImage == null) {
+                    imageUrl = image;
+                  } else {
+                    await FirebaseStorage.instance.refFromURL(image!).delete();
+                    var imageName =
+                        DateTime.now().millisecondsSinceEpoch.toString();
+                    var storageRef = FirebaseStorage.instance
+                        .ref()
+                        .child('images/motor/$imageName.jpg');
+                    var uploadTask = storageRef.putFile(selectedImage!);
+                    imageUrl = await (await uploadTask).ref.getDownloadURL();
+                  }
 
-                  MotorService().addMotor(
+                  MotorService().updateMotor(
+                    widget.docID!,
                     namaMotorController.text,
                     int.parse(hargaController.text),
                     selectedMerk,
-                    downloadUrl,
+                    imageUrl!,
                   );
+
                   Navigator.pop(context);
                   Navigator.popAndPushNamed(context, '/add_motor_page');
                 },
@@ -176,6 +194,137 @@ class _FormMotorPageState extends State<FormMotorPage> {
     }
   }
 
+  Widget form(String? namaMotor, String? merk, String? image, int? harga) {
+    if (namaMotor != null && merk != null && image != null && harga != null) {
+      namaMotorController.text = namaMotor;
+      selectedMerk = merk;
+      hargaController.text = harga.toString();
+      this.image = image;
+    }
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            margin: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+            padding: EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Input Motor',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                // Input Nama Motor
+                _textField('Nama Motor', namaMotorController),
+                SizedBox(
+                  height: 10,
+                ),
+
+                _textField('Harga', hargaController),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('Merk'),
+                SizedBox(
+                  height: 10,
+                ),
+                DropdownButtonFormField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                  value: selectedMerk,
+                  items: listMerk
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(e),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMerk = newValue!;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('Foto Motor'),
+                SizedBox(
+                  height: 10,
+                ),
+
+                Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        pickImage();
+                      },
+                      child: Text(
+                        'Upload Gambar',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStatePropertyAll<Color>(Colors.grey[200]!),
+                      ),
+                    ),
+                    selectedImage != null
+                        ? Image.file(
+                            selectedImage!,
+                            height: 50,
+                          )
+                        : image != null
+                            ? Image.network(
+                                image!,
+                                height: 50,
+                              )
+                            : Text('Anda belum memasukkan gambar')
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                widget.docID == null
+                    ? MyButton(
+                        text: 'Simpan',
+                        fontSize: 15,
+                        onTap: addMotor,
+                      )
+                    : MyButton(
+                        text: 'Update',
+                        fontSize: 15,
+                        onTap: updateMotor,
+                      ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,123 +338,24 @@ class _FormMotorPageState extends State<FormMotorPage> {
             )),
         backgroundColor: Colors.lightBlue[600],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              margin: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
-              padding: EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.white,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Input Motor',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  // Input Nama Motor
-                  _textField('Nama Motor', namaMotorController),
-                  SizedBox(
-                    height: 10,
-                  ),
+      body: widget.docID != null
+          ? FutureBuilder(
+              future: _motorData,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator(); // Show loading indicator
+                }
+                DocumentSnapshot motorDoc = snapshot.data!;
+                String namaMotor = motorDoc['namaMotor'];
+                int harga = motorDoc['harga'];
+                String merk = motorDoc['merk'];
+                String imageUrl = motorDoc['Image'];
+                print(imageUrl);
 
-                  _textField('Harga', hargaController),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text('Merk'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.black),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.black),
-                      ),
-                    ),
-                    value: selectedMerk,
-                    items: listMerk
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(e),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedMerk = newValue!;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text('Foto Motor'),
-                  SizedBox(
-                    height: 10,
-                  ),
-
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          pickImage();
-                        },
-                        child: Text(
-                          'Upload Gambar',
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll<Color>(
-                              Colors.grey[200]!),
-                        ),
-                      ),
-                      selectedImage != null
-                          ? Image.file(
-                              selectedImage!,
-                              height: 50,
-                            )
-                          : Text('Anda belum memasukkan gambar')
-                    ],
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  widget.docID == null
-                      ? MyButton(
-                          text: 'Simpan',
-                          fontSize: 15,
-                          onTap: addMotor,
-                        )
-                      : MyButton(
-                          text: 'Update',
-                          fontSize: 15,
-                          onTap: updateMotor,
-                        ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+                return form(namaMotor, merk, imageUrl, harga);
+              },
+            )
+          : form(null, null, null, null),
     );
   }
 }

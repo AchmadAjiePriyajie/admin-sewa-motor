@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 class MotorService {
   final CollectionReference motor =
@@ -30,8 +32,13 @@ class MotorService {
     return docSnapshot;
   }
 
-  Future<void> deleteNote(String docID) {
-    return motor.doc(docID).delete();
+  Future<void> deleteMotor(String docID) async {
+    DocumentReference motorData = motor.doc(docID);
+    DocumentSnapshot motorSnapshot = await getMotorById(docID);
+    await FirebaseStorage.instance
+        .refFromURL(motorSnapshot.get('Image'))
+        .delete();
+    return motorData.delete();
   }
 
   Future<void> updateMotor(String docID, String namaMotor, int harga,
