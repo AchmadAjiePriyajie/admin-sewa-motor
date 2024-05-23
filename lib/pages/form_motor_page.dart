@@ -308,7 +308,7 @@ class _FormMotorPageState extends State<FormMotorPage> {
                           )
                         : image != null
                             ? Image.network(
-                                image!,
+                                image,
                                 height: 50,
                               )
                             : Text('Anda belum memasukkan gambar')

@@ -54,7 +54,7 @@ class MotorService {
         kapasitasMesin: kapasitasMesin,
         imageUrl: imageUrl,
         isOrdered: false,
-      ) as Map<Object, Object?>,
+      ).toJson(),
     );
   }
 }
