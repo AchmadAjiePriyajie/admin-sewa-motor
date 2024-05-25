@@ -56,6 +56,7 @@ class MyDrawer extends StatelessWidget {
             title: Text('Motor'),
           ),
           ListTile(
+            onTap: () => Navigator.pushNamed(context, '/transaction_page'),
             leading: Icon(
               Icons.receipt,
             ),
