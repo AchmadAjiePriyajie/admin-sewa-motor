@@ -57,4 +57,31 @@ class MotorService {
       ).toJson(),
     );
   }
+
+  Future<void> statusUpdate(String docID) async {
+    DocumentReference docRef = motor.doc(docID);
+
+    // Update specific field (recommended)
+    await docRef
+        .update({'isOrdered': false}); // Directly update the 'isOrdered' field
+
+    // Update with custom class
+    final transactionData = Motors(isOrdered: false);
+    await docRef.update(
+        transactionData.toMap()); // Assuming Transaksi has a 'toMap()' method
+  }
+
+  
+}
+
+class Motors {
+  final bool isOrdered;
+
+  Motors({required this.isOrdered});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'isOrdered': isOrdered, // Assuming 'status' is the only field you want to update
+    };
+  }
 }

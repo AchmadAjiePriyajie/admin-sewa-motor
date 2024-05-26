@@ -1,3 +1,4 @@
+import 'package:admin_sewa_motor/Services/motor_service.dart';
 import 'package:admin_sewa_motor/Services/transaction_services.dart';
 import 'package:admin_sewa_motor/Services/user_services.dart';
 import 'package:admin_sewa_motor/components/my_button.dart';
@@ -136,6 +137,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                     DocumentSnapshot motorDoc = snapshot.data!;
                     String namaMotor = motorDoc['namaMotor'];
                     int harga = motorDoc['harga'];
+                    
                     return FutureBuilder(
                       future: userData.get(),
                       builder:
@@ -353,6 +355,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                               onTap: () {
                                                 updateStatus('Completed');
                                                 UserServices().transactionIdUpdate(email);
+                                                MotorService().statusUpdate(motorDoc.id);
                                               },
                                             )
                                           : Text(''),
