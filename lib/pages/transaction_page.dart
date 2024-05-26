@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -53,7 +54,7 @@ class _TransactionPageState extends State<TransactionPage> {
             child: Column(
               children: [
                 Text(
-                  'Status Transaction',
+                  'Status Transaksi',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -304,7 +305,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     Padding(
                       padding: const EdgeInsets.all(10),
                       child: Text(
-                        'Recent Transaction',
+                        'Transaksi Terbaru',
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -397,7 +398,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                       Row(
                                         children: [
                                           Text(
-                                            'Total : Rp.' + price.toString(),
+                                            'Total : ' + NumberFormat.currency(locale: 'id', decimalDigits: 0, symbol: 'Rp ').format(price),
                                             style: GoogleFonts.poppins(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w400,
@@ -411,7 +412,9 @@ class _TransactionPageState extends State<TransactionPage> {
                                         children: [
                                           Container(
                                             decoration: BoxDecoration(
-                                                color: Colors.red,
+                                                color: status == 'Completed'
+                                                ?Colors.green
+                                                :Colors.red,
                                                 borderRadius:
                                                     BorderRadius.circular(5)),
                                             child: Padding(
@@ -435,7 +438,7 @@ class _TransactionPageState extends State<TransactionPage> {
                           ),
                         );
                         }
-                        return Text('Transaksi tidak ditemukan');
+                        return Text('');
                       }
 
                       );

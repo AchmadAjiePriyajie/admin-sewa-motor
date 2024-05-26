@@ -5,6 +5,12 @@ class UserServices {
   final CollectionReference users =
       FirebaseFirestore.instance.collection('Users');
 
+  Stream<QuerySnapshot> getUserStreamTotal() {
+    final userStream =
+        users.snapshots();
+    return userStream;
+  }
+
   Future<void> transactionIdUpdate(String docID) async {
     DocumentReference docRef = users.doc(docID);
 

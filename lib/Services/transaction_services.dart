@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin_sewa_motor/Services/motor_service.dart';
 import 'package:admin_sewa_motor/models/transaksi.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,6 +22,11 @@ class TransactionServices {
     return transactionStream;
   }
 
+  Stream<QuerySnapshot> getTransactionStreamTotal() {
+    final transactionStream = transaction.snapshots();
+    return transactionStream;
+  }
+
   Future<DocumentSnapshot> getTransactionById(String docID) async {
     DocumentReference docRef = transaction.doc(docID);
     DocumentSnapshot docSnapshot = await docRef.get();
@@ -37,5 +44,15 @@ class TransactionServices {
     final transactionData = Transaksi(status: status);
     await docRef.update(
         transactionData.toMap()); // Assuming Transaksi has a 'toMap()' method
+  }
+
+  
+
+
+  Future<AggregateQuerySnapshot> getTotal() async {
+    
+
+    final count = await transaction.aggregate(sum("total_price")).get();
+    return count;
   }
 }

@@ -21,6 +21,7 @@ class MotorService {
     );
   }
 
+
   Stream<QuerySnapshot> getMotorStream() {
     final motorStream =
         motor.orderBy('timestamp', descending: true).snapshots();

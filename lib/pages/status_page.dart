@@ -3,6 +3,7 @@ import 'package:admin_sewa_motor/pages/detail_transaksi.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class StatusPage extends StatefulWidget {
   final String status;
@@ -79,7 +80,7 @@ class _StatusPageState extends State<StatusPage> {
                                 ),
                                 Container(
                                   height: 90,
-                                  width: 240,
+                                  width: 255,
                                   padding: EdgeInsets.only(left: 10),
                                   child: Column(
                                     children: [
@@ -108,7 +109,7 @@ class _StatusPageState extends State<StatusPage> {
                                       Row(
                                         children: [
                                           Text(
-                                            'Total : Rp.' + price.toString(),
+                                            'Total : ' + NumberFormat.currency(locale: 'id', decimalDigits: 0, symbol: 'Rp ').format(price),
                                             style: GoogleFonts.poppins(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w400,
@@ -122,7 +123,9 @@ class _StatusPageState extends State<StatusPage> {
                                         children: [
                                           Container(
                                             decoration: BoxDecoration(
-                                                color: Colors.red,
+                                                color: status == 'Completed'
+                                                ?Colors.green
+                                                :Colors.red,
                                                 borderRadius:
                                                     BorderRadius.circular(5)),
                                             child: Padding(
@@ -146,7 +149,7 @@ class _StatusPageState extends State<StatusPage> {
                           ),
                         );
                         }
-                        return Text('Transaksi tidak ditemukan');
+                        return Text('');
                       }
 
                       );

@@ -1,6 +1,7 @@
 import 'package:admin_sewa_motor/Services/motor_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MotorDetailPage extends StatefulWidget {
   final String docID;
@@ -124,7 +125,7 @@ class _MotorDetailPageState extends State<MotorDetailPage> {
                           ),
                         ),
                         title: Text(
-                          'Rp.$harga/jam',
+                          NumberFormat.currency(locale: 'id' , decimalDigits: 0 , symbol: 'Rp ').format(harga),
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,

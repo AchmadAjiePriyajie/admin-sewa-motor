@@ -5,6 +5,7 @@ import 'package:admin_sewa_motor/components/my_button.dart';
 import 'package:admin_sewa_motor/components/my_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DetailTransaksiPage extends StatefulWidget {
   final docId;
@@ -17,6 +18,7 @@ class DetailTransaksiPage extends StatefulWidget {
 class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
   TransactionServices transactionServices = TransactionServices();
   String? status;
+  String? metodePembayaran;
 
   void updateStatus(String _status) {
     showDialog(
@@ -38,9 +40,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
               ),
               TextButton(
                 onPressed: () async {
-                  TransactionServices().StatusUpdate(
-                    widget.docId!, _status
-                  );
+                  TransactionServices().StatusUpdate(widget.docId!, _status);
 
                   Navigator.pop(context);
                   Navigator.popAndPushNamed(context, '/transaction_page');
@@ -54,7 +54,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
               ),
             ],
           );
-        } else if (status == 'Ongoing'){
+        } else if (status == 'Ongoing') {
           return AlertDialog(
             title: Text('Konfirmasi'),
             content: Text('Apakah anda yakin ingin konfirmasi pengembalian'),
@@ -70,9 +70,37 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
               ),
               TextButton(
                 onPressed: () async {
-                  TransactionServices().StatusUpdate(
-                    widget.docId!, _status
-                  );
+                  TransactionServices().StatusUpdate(widget.docId!, _status);
+
+                  Navigator.pop(context);
+                  Navigator.popAndPushNamed(context, '/transaction_page');
+                },
+                child: Text(
+                  'Konfirmasi',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          );
+        } else if (status == 'Pending') {
+          return AlertDialog(
+            title: Text('Konfirmasi'),
+            content: Text('Apakah anda yakin ingin konfirmasi pembayaran'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Batal',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  TransactionServices().StatusUpdate(widget.docId!, _status);
 
                   Navigator.pop(context);
                   Navigator.popAndPushNamed(context, '/transaction_page');
@@ -125,7 +153,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
               String transactionId = transactionDoc['transactionId'];
               int durasiSewa = transactionDoc['duration'];
               double total = transactionDoc['total_price'];
-              String metodePembayaran = transactionDoc['payment_method'];
+              metodePembayaran = transactionDoc['payment_method'];
               status = transactionDoc['status'];
               DocumentReference motorData = transactionDoc['motorId'];
               DocumentReference userData = transactionDoc['userId'];
@@ -137,7 +165,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                     DocumentSnapshot motorDoc = snapshot.data!;
                     String namaMotor = motorDoc['namaMotor'];
                     int harga = motorDoc['harga'];
-                    
+
                     return FutureBuilder(
                       future: userData.get(),
                       builder:
@@ -242,7 +270,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                     Row(
                                       children: [
                                         MyText(
-                                          text: '${durasiSewa.toString()} jam',
+                                          text: '${durasiSewa.toString()} Jam',
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -262,7 +290,11 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                     Row(
                                       children: [
                                         MyText(
-                                            text: 'Rp.${harga.toString()}',
+                                            text: NumberFormat.currency(
+                                                    locale: 'id',
+                                                    symbol: 'Rp ',
+                                                    decimalDigits: 0)
+                                                .format(harga),
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
                                       ],
@@ -282,7 +314,11 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                     Row(
                                       children: [
                                         MyText(
-                                            text: 'Rp.${total.toString()}',
+                                            text: NumberFormat.currency(
+                                                    locale: 'id',
+                                                    symbol: 'Rp ',
+                                                    decimalDigits: 0)
+                                                .format(total),
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
                                       ],
@@ -301,7 +337,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                     Row(
                                       children: [
                                         MyText(
-                                            text: metodePembayaran,
+                                            text: metodePembayaran.toString(),
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
                                       ],
@@ -333,33 +369,46 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                           milliseconds:
                                               300), // Adjust animation duration as needed
                                       // Customize the transition if desired
-                                      child: status == 'Paid'
-                                          ? MyButton(
-                                              text: 'Konfirmasi Pengambilan',
-                                              fontSize: 14,
-                                              onTap: () {
-                                                updateStatus('Ongoing');
-                                              },
-                                            )
-                                          : Text(''),
+                                      child: Column(
+                                        children: [
+                                          status == 'Paid'
+                                              ? MyButton(
+                                                  text:
+                                                      'Konfirmasi Pengembalian',
+                                                  fontSize: 14,
+                                                  onTap: () {
+                                                    updateStatus('Ongoing');
+                                                  },
+                                                )
+                                              : Text(''),
+                                          status == 'OnGoing'
+                                              ? MyButton(
+                                                  text:
+                                                      'Konfirmasi Pengambilan',
+                                                  fontSize: 14,
+                                                  onTap: () {
+                                                    updateStatus('Ongoing');
+                                                    UserServices()
+                                                        .transactionIdUpdate(
+                                                            email);
+                                                    MotorService().statusUpdate(
+                                                        motorDoc.id);
+                                                  },
+                                                )
+                                              : Text(''),
+                                          status == 'Pending' &&
+                                                  metodePembayaran == 'Cash'
+                                              ? MyButton(
+                                                  text: 'Konfirmasi Pembayaran',
+                                                  fontSize: 14,
+                                                  onTap: () {
+                                                    updateStatus('Paid');
+                                                  },
+                                                )
+                                              : Text(''),
+                                        ],
+                                      ),
                                     ),
-                                    AnimatedSwitcher(
-                                      duration: Duration(
-                                          milliseconds:
-                                              300), // Adjust animation duration as needed
-                                      // Customize the transition if desired
-                                      child: status == 'Ongoing'
-                                          ? MyButton(
-                                              text: 'Konfirmasi Pengembalian',
-                                              fontSize: 14,
-                                              onTap: () {
-                                                updateStatus('Completed');
-                                                UserServices().transactionIdUpdate(email);
-                                                MotorService().statusUpdate(motorDoc.id);
-                                              },
-                                            )
-                                          : Text(''),
-                                    )
                                   ],
                                 ),
                               )
