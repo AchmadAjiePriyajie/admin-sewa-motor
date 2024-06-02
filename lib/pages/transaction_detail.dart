@@ -18,9 +18,14 @@ class DetailTransaksiPage extends StatefulWidget {
 class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
   TransactionServices transactionServices = TransactionServices();
   String? status;
+  int? durasiSewa;
   String? metodePembayaran;
 
-  void updateStatus(String _status) {
+  Widget Transaction() {
+    return Container();
+  }
+
+  void updateStatus(String _status, int totalPenjualan, String motorId) {
     showDialog(
       context: context,
       builder: (context) {
@@ -41,7 +46,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
               TextButton(
                 onPressed: () async {
                   TransactionServices().StatusUpdate(widget.docId!, _status);
-
+                  TransactionServices().countdownUpdate(widget.docId, durasiSewa!);
                   Navigator.pop(context);
                   Navigator.popAndPushNamed(context, '/transaction_page');
                 },
@@ -71,7 +76,7 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
               TextButton(
                 onPressed: () async {
                   TransactionServices().StatusUpdate(widget.docId!, _status);
-
+                  MotorService().salesUpdate(motorId, totalPenjualan);
                   Navigator.pop(context);
                   Navigator.popAndPushNamed(context, '/transaction_page');
                 },
@@ -151,10 +156,12 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                 ); // Handle non-existent motor
               }
               String transactionId = transactionDoc['transactionId'];
-              int durasiSewa = transactionDoc['duration'];
+              durasiSewa = transactionDoc['duration'];
               double total = transactionDoc['total_price'];
               metodePembayaran = transactionDoc['payment_method'];
               status = transactionDoc['status'];
+              Timestamp order = transactionDoc['orderedAt'];
+              DateTime _order = order.toDate();
               DocumentReference motorData = transactionDoc['motorId'];
               DocumentReference userData = transactionDoc['userId'];
 
@@ -165,6 +172,8 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                     DocumentSnapshot motorDoc = snapshot.data!;
                     String namaMotor = motorDoc['namaMotor'];
                     int harga = motorDoc['harga'];
+                    int totalPenjualan = motorDoc['totalPenjualan'];
+                    String motorId = motorDoc.id;
 
                     return FutureBuilder(
                       future: userData.get(),
@@ -214,6 +223,25 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                       children: [
                                         MyText(
                                             text: namaUser,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        MyText(
+                                            text: 'Order At',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        MyText(
+                                            text: DateFormat('dd MMMM yyyy HH:mm').format(_order),
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
                                       ],
@@ -374,38 +402,42 @@ class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
                                           status == 'Paid'
                                               ? MyButton(
                                                   text:
-                                                      'Konfirmasi Pengembalian',
-                                                  fontSize: 14,
-                                                  onTap: () {
-                                                    updateStatus('Ongoing');
-                                                  },
-                                                )
-                                              : Text(''),
-                                          status == 'OnGoing'
-                                              ? MyButton(
-                                                  text:
                                                       'Konfirmasi Pengambilan',
                                                   fontSize: 14,
                                                   onTap: () {
-                                                    updateStatus('Ongoing');
-                                                    UserServices()
-                                                        .transactionIdUpdate(
-                                                            email);
-                                                    MotorService().statusUpdate(
-                                                        motorDoc.id);
+                                                    updateStatus('Ongoing', 0, motorId);
                                                   },
                                                 )
-                                              : Text(''),
-                                          status == 'Pending' &&
-                                                  metodePembayaran == 'Cash'
-                                              ? MyButton(
-                                                  text: 'Konfirmasi Pembayaran',
-                                                  fontSize: 14,
-                                                  onTap: () {
-                                                    updateStatus('Paid');
-                                                  },
-                                                )
-                                              : Text(''),
+                                              : status == 'Ongoing'
+                                                  ? MyButton(
+                                                      text:
+                                                          'Konfirmasi Pengambilan',
+                                                      fontSize: 14,
+                                                      onTap: () {
+                                                        int _totalPenjualan = totalPenjualan + 1;
+                                                        updateStatus(
+                                                            'Completed', _totalPenjualan, motorId);
+                                                        UserServices()
+                                                            .transactionIdUpdate(
+                                                                email);
+                                                        MotorService()
+                                                            .statusUpdate(
+                                                                motorDoc.id);
+                                                      },
+                                                    )
+                                                  : status == 'Pending' &&
+                                                          metodePembayaran ==
+                                                              'Cash'
+                                                      ? MyButton(
+                                                          text:
+                                                              'Konfirmasi Pembayaran',
+                                                          fontSize: 14,
+                                                          onTap: () {
+                                                            updateStatus(
+                                                                'Paid', 0, motorId);
+                                                          },
+                                                        )
+                                                      : SizedBox(),
                                         ],
                                       ),
                                     ),

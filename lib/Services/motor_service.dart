@@ -21,10 +21,9 @@ class MotorService {
     );
   }
 
-
   Stream<QuerySnapshot> getMotorStream() {
     final motorStream =
-        motor.orderBy('timestamp', descending: true).snapshots();
+        motor.orderBy('timestamp', descending: false).snapshots();
     return motorStream;
   }
 
@@ -47,32 +46,27 @@ class MotorService {
       int harga, String merk, String imageUrl) async {
     DocumentReference docRef = motor.doc(docID);
 
-    await docRef.update(
-      Motor(
-        namaMotor: namaMotor,
-        harga: harga,
-        merk: merk,
-        kapasitasMesin: kapasitasMesin,
-        imageUrl: imageUrl,
-        isOrdered: false,
-      ).toJson(),
-    );
+    await docRef.update({
+      'Image': imageUrl,
+      'harga': harga,
+      'isOrdered': false,
+      'kapasitas_mesin': kapasitasMesin,
+      'merk': merk,
+      'namaMotor': namaMotor,
+    });
+  }
+
+  Future<void> salesUpdate(String docID, int totalPenjualan) async {
+    DocumentReference docRef = motor.doc(docID);
+
+    await docRef.update({'totalPenjualan': totalPenjualan});
   }
 
   Future<void> statusUpdate(String docID) async {
     DocumentReference docRef = motor.doc(docID);
 
-    // Update specific field (recommended)
-    await docRef
-        .update({'isOrdered': false}); // Directly update the 'isOrdered' field
-
-    // Update with custom class
-    final transactionData = Motors(isOrdered: false);
-    await docRef.update(
-        transactionData.toMap()); // Assuming Transaksi has a 'toMap()' method
+    await docRef.update({'isOrdered': false});
   }
-
-  
 }
 
 class Motors {
@@ -82,7 +76,8 @@ class Motors {
 
   Map<String, dynamic> toMap() {
     return {
-      'isOrdered': isOrdered, // Assuming 'status' is the only field you want to update
+      'isOrdered':
+          isOrdered, // Assuming 'status' is the only field you want to update
     };
   }
 }

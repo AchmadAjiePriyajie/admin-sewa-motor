@@ -8,6 +8,7 @@ class Motor {
   final int kapasitasMesin;
   final bool isOrdered;
   final Timestamp? timestamp;
+  final int? totalPenjualan;
 
   Motor({
     required this.namaMotor,
@@ -17,6 +18,7 @@ class Motor {
     required this.imageUrl,
     required this.isOrdered,
     this.timestamp,
+    this.totalPenjualan
   });
 
   factory Motor.fromJson(Map<String, dynamic> json) => Motor(
@@ -37,5 +39,6 @@ class Motor {
         'Image': imageUrl,
         'isOrdered': isOrdered,
         'timestamp': timestamp,
+        'totalPenjualan' : 0
       };
 }

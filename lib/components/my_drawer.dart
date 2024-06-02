@@ -47,6 +47,7 @@ class MyDrawer extends StatelessWidget {
               Icons.group,
             ),
             title: Text('Users'),
+            onTap: () => Navigator.pushNamed(context, '/user_page'),
           ),
           ListTile(
             onTap: () => Navigator.pushNamed(context, '/motor_page'),

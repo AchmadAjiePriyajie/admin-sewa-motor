@@ -1,5 +1,5 @@
 import 'package:admin_sewa_motor/Services/transaction_services.dart';
-import 'package:admin_sewa_motor/pages/detail_transaksi.dart';
+import 'package:admin_sewa_motor/pages/transaction_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -1,11 +1,9 @@
 import 'package:admin_sewa_motor/Services/transaction_services.dart';
 import 'package:admin_sewa_motor/components/my_drawer.dart';
-import 'package:admin_sewa_motor/pages/detail_transaksi.dart';
+import 'package:admin_sewa_motor/pages/transaction_detail.dart';
 import 'package:admin_sewa_motor/pages/status_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -68,8 +66,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                StatusPage(status: 'Pending'),
+                            builder: (context) => StatusPage(status: 'Pending'),
                           ),
                         );
                       },
@@ -79,8 +76,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         child: Column(
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Container(
                                   height: 22,
                                   child: StreamBuilder<QuerySnapshot>(
@@ -100,8 +96,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                           ),
                                         );
                                       } else if (snapshot.hasError) {
-                                        return Text(
-                                            "Error: ${snapshot.error}");
+                                        return Text("Error: ${snapshot.error}");
                                       } else {
                                         return const Text('0');
                                       }
@@ -124,8 +119,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                StatusPage(status: 'Paid'),
+                            builder: (context) => StatusPage(status: 'Paid'),
                           ),
                         );
                       },
@@ -135,33 +129,32 @@ class _TransactionPageState extends State<TransactionPage> {
                         child: Column(
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Container(
-                                  height: 22,
-                                  child: StreamBuilder<QuerySnapshot>(
-                                    stream: transactionServices
-                                        .getTransactionStreamByStatus('Paid'),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        final transactionList =
-                                            snapshot.data!.docs;
-                                        final total = transactionList.length;
-                                        return Text(
-                                          total.toString(),
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Text(
-                                            "Error: ${snapshot.error}");
-                                      } else {
-                                        return const Text('0');
-                                      }
-                                    },
-                                  )),
+                                height: 22,
+                                child: StreamBuilder<QuerySnapshot>(
+                                  stream: transactionServices
+                                      .getTransactionStreamByStatus('Paid'),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final transactionList =
+                                          snapshot.data!.docs;
+                                      final total = transactionList.length;
+                                      return Text(
+                                        total.toString(),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text("Error: ${snapshot.error}");
+                                    } else {
+                                      return const Text('0');
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
                             Text(
                               'Paid',
@@ -179,8 +172,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                StatusPage(status: 'Ongoing'),
+                            builder: (context) => StatusPage(status: 'Ongoing'),
                           ),
                         );
                       },
@@ -190,8 +182,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         child: Column(
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Container(
                                   height: 22,
                                   child: StreamBuilder<QuerySnapshot>(
@@ -211,8 +202,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                           ),
                                         );
                                       } else if (snapshot.hasError) {
-                                        return Text(
-                                            "Error: ${snapshot.error}");
+                                        return Text("Error: ${snapshot.error}");
                                       } else {
                                         return const Text('0');
                                       }
@@ -246,8 +236,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         child: Column(
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Container(
                                   height: 22,
                                   child: StreamBuilder<QuerySnapshot>(
@@ -267,8 +256,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                           ),
                                         );
                                       } else if (snapshot.hasError) {
-                                        return Text(
-                                            "Error: ${snapshot.error}");
+                                        return Text("Error: ${snapshot.error}");
                                       } else {
                                         return const Text('0');
                                       }
@@ -318,138 +306,165 @@ class _TransactionPageState extends State<TransactionPage> {
                 Container(
                   height: 550,
                   child: StreamBuilder<QuerySnapshot>(
-          stream:
-              transactionServices.getTransactionStream(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<DocumentSnapshot> transactionList = snapshot.data!.docs;
-              return ListView.builder(
-                itemCount: transactionList.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot document = transactionList[index];
-                  // get note from each doc
-                  Map<String, dynamic> data =
-                      document.data() as Map<String, dynamic>;
+                      stream: transactionServices.getTransactionStream(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<DocumentSnapshot> transactionList =
+                              snapshot.data!.docs;
+                          return ListView.builder(
+                            itemCount: transactionList.length,
+                            itemBuilder: (context, index) {
+                              DocumentSnapshot document =
+                                  transactionList[index];
+                              // get note from each doc
+                              Map<String, dynamic> data =
+                                  document.data() as Map<String, dynamic>;
 
-                  String docId = document.id;
-                  String id = data['transactionId'];
-                  double price = data['total_price'];
-                  String status = data['status'];
-                  DocumentReference motorData = data['motorId'];
+                              String docId = document.id;
+                              String id = data['transactionId'];
+                              double price = data['total_price'];
+                              String status = data['status'];
+                              DocumentReference motorData = data['motorId'];
 
-                  return FutureBuilder(
-                      future: motorData.get(),
-                      builder:
-                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        
-                        if (snapshot.hasData){
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    DetailTransaksiPage(docId: docId),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.only(
-                                left: 10, right: 10, bottom: 10),
-                            decoration: BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              children: [
-                                Image.network(
-                                  snapshot.data?['Image'] ,
-                                  height: 90,
-                                  width: 100,
-                                ),
-                                Container(
-                                  height: 90,
-                                  width: 240,
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            snapshot.data?['namaMotor'] ?? '-',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
+                              return FutureBuilder(
+                                  future: motorData.get(),
+                                  builder: (context,
+                                      AsyncSnapshot<DocumentSnapshot>
+                                          snapshot) {
+                                    if (snapshot.hasData) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailTransaksiPage(
+                                                      docId: docId),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'ID : ' + id,
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Total : ' + NumberFormat.currency(locale: 'id', decimalDigits: 0, symbol: 'Rp ').format(price),
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                color: status == 'Completed'
-                                                ?Colors.green
-                                                :Colors.red,
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(3),
-                                              child: Text(
-                                                status,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(10),
+                                          margin: EdgeInsets.only(
+                                              left: 10, right: 10, bottom: 10),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(),
+                                              borderRadius:
+                                                  BorderRadius.circular(12)),
+                                          child: Row(
+                                            children: [
+                                              Image.network(
+                                                snapshot.data?['Image'],
+                                                height: 90,
+                                                width: 100,
                                               ),
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
+                                              Container(
+                                                height: 90,
+                                                width: 240,
+                                                padding:
+                                                    EdgeInsets.only(left: 10),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          snapshot.data?[
+                                                                  'namaMotor'] ??
+                                                              '-',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'ID : ' + id,
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 11,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Total : ' +
+                                                              NumberFormat.currency(
+                                                                      locale:
+                                                                          'id',
+                                                                      decimalDigits:
+                                                                          0,
+                                                                      symbol:
+                                                                          'Rp ')
+                                                                  .format(
+                                                                      price),
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 11,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      children: [
+                                                        Container(
+                                                          decoration: BoxDecoration(
+                                                              color: status ==
+                                                                      'Completed'
+                                                                  ? Colors.green
+                                                                  : Colors.red,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5)),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(3),
+                                                            child: Text(
+                                                              status,
+                                                              style: GoogleFonts.poppins(
+                                                                  fontSize: 11,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return Text('');
+                                  });
+                            },
+                          );
+                        } else {
+                          return Text(
+                            'Belum ada motor',
+                          );
                         }
-                        return Text('');
-                      }
-
-                      );
-                },
-              );
-            } else {
-              return Text(
-                'Belum ada motor',
-              );
-            }
-          }),
+                      }),
                 ),
               ],
             ),

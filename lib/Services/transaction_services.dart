@@ -36,22 +36,22 @@ class TransactionServices {
   Future<void> StatusUpdate(String docID, String status) async {
     DocumentReference docRef = transaction.doc(docID);
 
-    // Update specific field (recommended)
-    await docRef
-        .update({'status': status}); // Directly update the 'status' field
+    await docRef.update({'status': status});
 
-    // Update with custom class
     final transactionData = Transaksi(status: status);
-    await docRef.update(
-        transactionData.toMap()); // Assuming Transaksi has a 'toMap()' method
+    await docRef.update(transactionData.toMap());
   }
 
-  
-
+  Future<void> countdownUpdate(String docID, int duration) async {
+    DocumentReference docRef = transaction.doc(docID);
+    Timestamp orderedAt = Timestamp.now();
+    DateTime orderedAtDateTime = orderedAt.toDate();
+    DateTime endDurationDateTime = orderedAtDateTime.add(Duration(hours: duration ));
+    Timestamp endDuration = Timestamp.fromDate(endDurationDateTime);
+    await docRef.update({'endDuration' : endDuration });
+  }
 
   Future<AggregateQuerySnapshot> getTotal() async {
-    
-
     final count = await transaction.aggregate(sum("total_price")).get();
     return count;
   }

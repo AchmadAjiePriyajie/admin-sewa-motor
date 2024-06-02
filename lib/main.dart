@@ -3,6 +3,7 @@ import 'package:admin_sewa_motor/pages/form_motor_page.dart';
 import 'package:admin_sewa_motor/pages/home_page.dart';
 import 'package:admin_sewa_motor/pages/motor_page.dart';
 import 'package:admin_sewa_motor/pages/transaction_page.dart';
+import 'package:admin_sewa_motor/pages/user_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         '/motor_page': (context) => MotorPage(),
         '/add_motor_page': (context) => FormMotorPage(),
         '/transaction_page': (context) => TransactionPage(),
+        '/user_page': (context) => UserPage(),
       },
     );
   }

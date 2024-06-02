@@ -52,6 +52,7 @@ class _MotorDetailPageState extends State<MotorDetailPage> {
             int harga = motorDoc['harga'];
             String merk = motorDoc['merk'];
             String imageUrl = motorDoc['Image'];
+            
             // Display motor details
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
